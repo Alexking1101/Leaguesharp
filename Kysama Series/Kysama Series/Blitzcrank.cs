@@ -10,9 +10,10 @@ using Color = System.Drawing.Color;
 
 #endregion
 
-namespace Blitzcrank
+
+namespace KS
 {
-    class Program
+    class Blitzcrank
     {
         public const string ChampionName = "Blitzcrank";
 
@@ -31,17 +32,14 @@ namespace Blitzcrank
 
         public static Obj_AI_Hero Player;
 
-        private static void Main(string[] args)
+        public Blitzcrank()
         {
-            CustomEvents.Game.OnGameLoad += Game_OnGameLoad;
+            Game_OnGameLoad();
         }
 
-        private static void Game_OnGameLoad(EventArgs args)
+        private static void Game_OnGameLoad()
         {
             Player = ObjectManager.Player;
-
-            if (Player.BaseSkinName != ChampionName) return;
-
 
             Q = new Spell(SpellSlot.Q, 950);
             E = new Spell(SpellSlot.E, Player.AttackRange + 50);
@@ -151,7 +149,7 @@ namespace Blitzcrank
             }
 
 
-            if (eTarget != null && useE && E.IsReady() && !Q.IsReady())
+            if (eTarget != null && useE && E.IsReady())
                 E.Cast();
 
 
@@ -197,7 +195,7 @@ namespace Blitzcrank
             {
                 var menuItem = Config.Item(spell.Slot + "Range").GetValue<Circle>();
                 if (menuItem.Active)
-                    Utility.DrawCircle(Player.Position, spell.Range, menuItem.Color);
+                    Render.Circle.DrawCircle(Player.Position, spell.Range, menuItem.Color);
             }
         }
 
