@@ -174,7 +174,7 @@ namespace KS
                 Combo();
             if (useRks)
                 Killsteal();
-            if (Config.Item("AutoUlt").GetValue<bool>() && Utility.CountEnemysInRange((int)R.Range) >= Config.Item("NR").GetValue<Slider>().Value && R.IsReady())
+            if (Config.Item("AutoUlt").GetValue<bool>() && Utility.CountEnemiesInRange((int)R.Range) >= Config.Item("NR").GetValue<Slider>().Value && R.IsReady())
                 R.Cast();
             if (Config.Item("APToggle").GetValue<bool>())
             {
