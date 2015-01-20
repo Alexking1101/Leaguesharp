@@ -56,7 +56,6 @@ namespace KS
             E = new Spell(SpellSlot.E, 650);
             R = new Spell(SpellSlot.R, 500);
 
-            SetSmiteSlot();
 
 
             SpellList.Add(Q);
