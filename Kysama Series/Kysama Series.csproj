@@ -64,6 +64,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Akali.cs" />
+    <Compile Include="Amumu.cs" />
     <Compile Include="Blitzcrank.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

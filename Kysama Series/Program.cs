@@ -38,8 +38,12 @@ namespace KS
                     new XinZhao();
                     break;
 
+                case "Amumu":
+                    new Amumu();
+                    break;
+
                 default:
-                    Game.PrintChat("This champion is not supported");
+                    Game.PrintChat("<font color='#05F4F4'>[Kysama Series] This Champion is not supportet</font>");
                     break;
             }
         }
