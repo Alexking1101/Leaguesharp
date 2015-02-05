@@ -240,7 +240,7 @@ namespace KS
             var useQks = Config.Item("KillstealQ").GetValue<bool>() && Q.IsReady();
 
 
-            if (Player.HasBuff("Despair"))
+            if (Player.HasBuff("AuraofDespair"))
             {
                 WAktiv = true;
             }
@@ -268,9 +268,12 @@ namespace KS
 
             foreach (var spell in SpellList)
             {
-                var menuItem = Config.Item(spell.Slot + "Range").GetValue<Circle>();
-                if (menuItem.Active)
-                    Render.Circle.DrawCircle(Player.Position, spell.Range, menuItem.Color);
+                if (Config.Item(spell.Slot + "Range") != null)
+                {
+                    var menuItem = Config.Item(spell.Slot + "Range").GetValue<Circle>();
+                    if (menuItem.Active)
+                        Render.Circle.DrawCircle(Player.Position, spell.Range, menuItem.Color);
+                }
             }
         }
 
