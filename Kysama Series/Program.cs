@@ -46,6 +46,10 @@ namespace KS
                     new Wukong();
                     break;
 
+                case "Olaf":
+                    new Olaf();
+                    break;
+
                 default:
                     Game.PrintChat("<font color='#05F4F4'>[Kysama Series] This Champion is not supportet</font>");
                     break;
