@@ -28,8 +28,6 @@ namespace KS
         public static Spell E;
         public static Spell R;
 
-        public static bool WAktiv = false;
-
 
         public static Menu Config;
 
@@ -172,8 +170,18 @@ namespace KS
             if (eTarget != null && useE && E.IsReady())
                 E.Cast();
 
-            if (!WAktiv && wTarget != null && useW && W.IsReady())
-                W.Cast();
+            if (wTarget != null && W.IsReady() && (Player.Spellbook.GetSpell(SpellSlot.W).ToggleState == 1) && useW)
+                {
+
+                    W.Cast();
+
+                }
+            if (wTarget != null && W.IsReady() && (Player.Spellbook.GetSpell(SpellSlot.W).ToggleState == 2) && useW)
+                {
+
+                    W.Cast();
+
+                }
         }
 
         static void LaneClear()
@@ -190,9 +198,17 @@ namespace KS
                     Q.Cast(vMinion.Position);
                 }
 
-                if (Config.Item("UseWLaneClear").GetValue<bool>() && W.IsReady() && !WAktiv && allMinionsW.Count > 2)
+                if (Config.Item("UseWLaneClear").GetValue<bool>() && W.IsReady() && allMinionsW[0].IsValidTarget())
                 {
-                    W.Cast();
+                    if (Player.Distance(allMinionsW[0]) <= W.Range && (Player.Spellbook.GetSpell(SpellSlot.W).ToggleState == 1))
+                    {
+                        W.Cast();
+                    }
+                    else if (Player.Distance(allMinionsW[0]) > W.Range && (Player.Spellbook.GetSpell(SpellSlot.W).ToggleState == 2))
+                    {
+                        W.Cast();
+                    }
+
                 }
 
                 if (Config.Item("UseELaneClear").GetValue<bool>() && E.IsReady() && allMinionsW.Count > 2)
@@ -214,10 +230,19 @@ namespace KS
                 {
                     Q.Cast(mobs[0].Position);
                 }
-                if (!WAktiv && Config.Item("UseWJungleClear").GetValue<bool>() && W.IsReady())
+                if (Config.Item("UseWJungleClear").GetValue<bool>() && W.IsReady() && mobs[0].IsValidTarget())
                 {
-                    W.Cast();
-                }
+                    if (Player.Distance(mobs[0]) <= W.Range && (Player.Spellbook.GetSpell(SpellSlot.W).ToggleState == 1))
+                    {
+                        W.Cast();
+                    }
+                    else if (Player.Distance(mobs[0]) > W.Range && (Player.Spellbook.GetSpell(SpellSlot.W).ToggleState == 2))
+                    {
+                        W.Cast();
+                    }
+
+                } 
+                // Credits to TheKushStyle for ToggleState :)
                 if (Config.Item("UseEJungleClear").GetValue<bool>() && E.IsReady())
                 {
                     E.Cast();
@@ -238,16 +263,6 @@ namespace KS
 
             var useRks = Config.Item("KillstealR").GetValue<bool>() && R.IsReady();
             var useQks = Config.Item("KillstealQ").GetValue<bool>() && Q.IsReady();
-
-
-            if (Player.HasBuff("Despair"))
-            {
-                WAktiv = true;
-            }
-            else
-            {
-                WAktiv = false;
-            }
 
             if (Config.Item("ComboActive").GetValue<KeyBind>().Active)
                 Combo();

@@ -42,6 +42,10 @@ namespace KS
                     new Amumu();
                     break;
 
+                case "MonkeyKing":
+                    new Wukong();
+                    break;
+
                 default:
                     Game.PrintChat("<font color='#05F4F4'>[Kysama Series] This Champion is not supportet</font>");
                     break;

@@ -13,9 +13,9 @@ using Color = System.Drawing.Color;
 
 namespace KS
 {
-    class XinZhao
+    class Wukong
     {
-        public const string ChampionName = "XinZhao";
+        public const string ChampionName = "MonkeyKing";
 
 
         public static Orbwalking.Orbwalker Orbwalker;
@@ -33,12 +33,11 @@ namespace KS
         public static Items.Item hydra;
         public static Items.Item blade;
 
-
         public static Menu Config;
 
         public static Obj_AI_Hero Player;
 
-        public XinZhao()
+        public Wukong()
         {
             Game_OnGameLoad();
         }
@@ -51,7 +50,6 @@ namespace KS
             W = new Spell(SpellSlot.W, 20);
             E = new Spell(SpellSlot.E, 650);
             R = new Spell(SpellSlot.R, 500);
-
 
 
             SpellList.Add(Q);
@@ -107,6 +105,8 @@ namespace KS
             Config.AddSubMenu(new Menu("Misc", "Misc"));
             Config.SubMenu("Misc").AddItem(new MenuItem("InterruptSpells", "Interrupt spells with R").SetValue(true));
             Config.SubMenu("Misc").AddItem(new MenuItem("KillstealR", "Killsteal with R").SetValue(false));
+            Config.SubMenu("Misc").AddItem(new MenuItem("KillstealQ", "Killsteal with Q").SetValue(false));
+            Config.SubMenu("Misc").AddItem(new MenuItem("KillstealE", "Killsteal with E").SetValue(false));
 
 
             Config.AddSubMenu(new Menu("Drawings", "Drawings"));
@@ -150,17 +150,17 @@ namespace KS
 
             if (target != null && useE && E.IsReady())
             {
-                    E.Cast(target);
+                E.Cast(target);
             }
 
             if (target != null && useW && W.IsReady())
             {
-                    W.Cast();
+                W.Cast();
             }
 
             if (target != null && useQ && Q.IsReady())
             {
-                    Q.Cast();
+                Q.Cast();
             }
 
             if (target != null && useT && tiamat.IsReady())
@@ -223,29 +223,30 @@ namespace KS
             var minion = MinionManager.GetMinions(Player.ServerPosition, E.Range,
                 MinionTypes.All,
                 MinionTeam.NotAlly, MinionOrderTypes.MaxHealth);
-            
-            if(minion.Count > 0){
-                 var minions = minion[0];
-             if (Config.Item("UseQLaneClear").GetValue<bool>() && Q.IsReady() && minions.IsValidTarget(Q.Range))
-             {
-                 Q.Cast();
-             }
 
-             if (Config.Item("UseWLaneClear").GetValue<bool>() && W.IsReady())
-             {
-                 W.Cast();
-             }
-             if (Config.Item("UseELaneClear").GetValue<bool>() && E.IsReady() && minions.IsValidTarget(E.Range) )
-             {
-                 E.Cast(minions);
-             }
-             if (Config.Item("Tiamat").GetValue<bool>() && tiamat.IsReady())
-                 tiamat.Cast();
+            if (minion.Count > 0)
+            {
+                var minions = minion[0];
+                if (Config.Item("UseQLaneClear").GetValue<bool>() && Q.IsReady() && minions.IsValidTarget(Q.Range))
+                {
+                    Q.Cast();
+                }
 
-             if (Config.Item("Hydra").GetValue<bool>() && hydra.IsReady())
-                 hydra.Cast();
+                if (Config.Item("UseWLaneClear").GetValue<bool>() && W.IsReady())
+                {
+                    W.Cast();
+                }
+                if (Config.Item("UseELaneClear").GetValue<bool>() && E.IsReady() && minions.IsValidTarget(E.Range))
+                {
+                    E.Cast(minions);
+                }
+                if (Config.Item("Tiamat").GetValue<bool>() && tiamat.IsReady())
+                    tiamat.Cast();
+
+                if (Config.Item("Hydra").GetValue<bool>() && hydra.IsReady())
+                    hydra.Cast();
+            }
         }
-    }
         static void JungleClear()
         {
             var mobs = MinionManager.GetMinions(Player.ServerPosition, E.Range,
