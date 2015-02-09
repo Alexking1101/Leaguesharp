@@ -13,9 +13,9 @@ using Color = System.Drawing.Color;
 
 namespace KS
 {
-    class XinZhao
+    class Wukong
     {
-        public const string ChampionName = "XinZhao";
+        public const string ChampionName = "MonkeyKing";
 
 
         public static Orbwalking.Orbwalker Orbwalker;
@@ -33,12 +33,11 @@ namespace KS
         public static Items.Item hydra;
         public static Items.Item blade;
 
-
         public static Menu Config;
 
         public static Obj_AI_Hero Player;
 
-        public XinZhao()
+        public Wukong()
         {
             Game_OnGameLoad();
         }
@@ -47,11 +46,10 @@ namespace KS
         {
             Player = ObjectManager.Player;
 
-            Q = new Spell(SpellSlot.Q, 375);
-            W = new Spell(SpellSlot.W, 20);
-            E = new Spell(SpellSlot.E, 650);
-            R = new Spell(SpellSlot.R, 500);
-
+            Q = new Spell(SpellSlot.Q, 420f);
+            W = new Spell(SpellSlot.W);
+            E = new Spell(SpellSlot.E, 640f);
+            R = new Spell(SpellSlot.R, 355f);
 
 
             SpellList.Add(Q);
@@ -83,17 +81,17 @@ namespace KS
             Config.SubMenu("Combo").AddItem(new MenuItem("UseW", "Use W").SetValue(true));
             Config.SubMenu("Combo").AddItem(new MenuItem("UseE", "Use E").SetValue(true));
             Config.SubMenu("Combo").AddItem(new MenuItem("UseR", "Use R").SetValue(false));
+            Config.SubMenu("Combo").AddItem(new MenuItem("AutoUlt", "Auto Ultimate").SetValue(true));
+            Config.SubMenu("Combo").AddItem(new MenuItem("NR", "N. Enemy in Range to AutoUlt").SetValue(new Slider(1, 5, 0)));
             Config.SubMenu("Combo").AddItem(new MenuItem("ComboActive", "Combo!").SetValue(new KeyBind(Config.Item("Orbwalk").GetValue<KeyBind>().Key, KeyBindType.Press)));
 
             Config.AddSubMenu(new Menu("LaneClear", "LaneClear"));
             Config.SubMenu("LaneClear").AddItem(new MenuItem("UseQLaneClear", "Use Q").SetValue(true));
-            Config.SubMenu("LaneClear").AddItem(new MenuItem("UseWLaneClear", "Use W").SetValue(true));
             Config.SubMenu("LaneClear").AddItem(new MenuItem("UseELaneClear", "Use E").SetValue(true));
             Config.SubMenu("LaneClear").AddItem(new MenuItem("LaneClearActive", "Laneclear!").SetValue(new KeyBind("V".ToCharArray()[0], KeyBindType.Press)));
 
             Config.AddSubMenu(new Menu("JungleClear", "JungleClear"));
             Config.SubMenu("JungleClear").AddItem(new MenuItem("UseQJungleClear", "Use Q").SetValue(true));
-            Config.SubMenu("JungleClear").AddItem(new MenuItem("UseWJungleClear", "Use W").SetValue(true));
             Config.SubMenu("JungleClear").AddItem(new MenuItem("UseEJungleClear", "Use E").SetValue(true));
             Config.SubMenu("JungleClear").AddItem(new MenuItem("JungleClearActive", "JungleClear!").SetValue(new KeyBind("V".ToCharArray()[0], KeyBindType.Press)));
 
@@ -107,12 +105,13 @@ namespace KS
             Config.AddSubMenu(new Menu("Misc", "Misc"));
             Config.SubMenu("Misc").AddItem(new MenuItem("InterruptSpells", "Interrupt spells with R").SetValue(true));
             Config.SubMenu("Misc").AddItem(new MenuItem("KillstealR", "Killsteal with R").SetValue(false));
-            Config.SubMenu("Misc").AddItem(new MenuItem("Survive", "Use R to Flee").SetValue(false));
-            Config.SubMenu("Misc").AddItem(new MenuItem("HPForR", "if HP < X%").SetValue(new Slider(1, 100, 0)));
+            Config.SubMenu("Misc").AddItem(new MenuItem("KillstealQ", "Killsteal with Q").SetValue(false));
+            Config.SubMenu("Misc").AddItem(new MenuItem("KillstealE", "Killsteal with E").SetValue(false));
 
 
             Config.AddSubMenu(new Menu("Drawings", "Drawings"));
             Config.SubMenu("Drawings").AddItem(new MenuItem("ERange", "E Range").SetValue(new Circle(true, Color.FromArgb(150, Color.DodgerBlue))));
+            Config.SubMenu("Drawings").AddItem(new MenuItem("QRange", "Q Range").SetValue(new Circle(true, Color.FromArgb(150, Color.DodgerBlue))));
             Config.SubMenu("Drawings").AddItem(new MenuItem("RRange", "R Range").SetValue(new Circle(true, Color.FromArgb(150, Color.DodgerBlue))));
             Config.AddToMainMenu();
 
@@ -121,7 +120,7 @@ namespace KS
             Game.OnGameUpdate += Game_OnGameUpdate;
             Drawing.OnDraw += Drawing_OnDraw;
             Interrupter.OnPossibleToInterrupt += Interrupter_OnPossibleToInterrupt;
-            Game.PrintChat("<font color='#05F4F4'>Xin Zhao by Kysama loaded!</font>");
+            Game.PrintChat("<font color='#05F4F4'>Wukong by Kysama loaded!</font>");
         }
 
 
@@ -149,20 +148,19 @@ namespace KS
             bool useE = Config.Item("UseE").GetValue<bool>();
             bool useR = Config.Item("UseR").GetValue<bool>();
 
+            if (target != null && useW && W.IsReady())
+            {
+                W.Cast();
+            }
 
             if (target != null && useE && E.IsReady())
             {
-                    E.Cast(target);
-            }
-
-            if (target != null && useW && W.IsReady())
-            {
-                    W.Cast();
+                E.Cast(target);
             }
 
             if (target != null && useQ && Q.IsReady())
             {
-                    Q.Cast();
+                Q.Cast();
             }
 
             if (target != null && useR && R.IsReady())
@@ -195,16 +193,22 @@ namespace KS
 
 
             var useRks = Config.Item("KillstealR").GetValue<bool>() && R.IsReady();
+            var useQks = Config.Item("KillstealQ").GetValue<bool>() && Q.IsReady();
+            var useEks = Config.Item("KillstealE").GetValue<bool>() && E.IsReady();
 
             if (Config.Item("ComboActive").GetValue<KeyBind>().Active)
                 Combo();
             if (Config.Item("LaneClearActive").GetValue<KeyBind>().Active)
                 LaneClear();
             if (useRks)
-                Killsteal();
+                KillstealR();
+            if (useQks)
+                KillstealQ();
+            if (useEks)
+                KillstealE();
             if (Config.Item("JungleClearActive").GetValue<KeyBind>().Active)
                 JungleClear();
-            if (R.IsReady() && Config.Item("HPForR").GetValue<Slider>().Value >= ((Player.Health / Player.MaxHealth) * 100))
+            if (Config.Item("AutoUlt").GetValue<bool>() && Utility.CountEnemiesInRange((int)R.Range) >= Config.Item("NR").GetValue<Slider>().Value && R.IsReady())
                 R.Cast();
         }
 
@@ -218,7 +222,7 @@ namespace KS
                     Render.Circle.DrawCircle(Player.Position, spell.Range, menuItem.Color);
             }
         }
-        private static void Killsteal()
+        private static void KillstealR()
         {
             foreach (var hero in ObjectManager.Get<Obj_AI_Hero>().Where(hero => hero.IsValidTarget(R.Range)))
             {
@@ -227,34 +231,54 @@ namespace KS
                     R.Cast();
             }
         }
+
+        private static void KillstealQ()
+        {
+            foreach (var hero in ObjectManager.Get<Obj_AI_Hero>().Where(hero => hero.IsValidTarget(Q.Range)))
+            {
+                if (Q.IsReady() && hero.Distance(ObjectManager.Player) <= Q.Range &&
+                    Player.GetSpellDamage(hero, SpellSlot.Q) >= hero.Health)
+                    Q.Cast();
+            }
+        }
+
+        private static void KillstealE()
+        {
+            foreach (var hero in ObjectManager.Get<Obj_AI_Hero>().Where(hero => hero.IsValidTarget(E.Range)))
+            {
+                if (E.IsReady() && hero.Distance(ObjectManager.Player) <= E.Range &&
+                    Player.GetSpellDamage(hero, SpellSlot.E) >= hero.Health)
+                    E.Cast(hero);
+            }
+        }
         static void LaneClear()
         {
             var minion = MinionManager.GetMinions(Player.ServerPosition, E.Range,
                 MinionTypes.All,
                 MinionTeam.NotAlly, MinionOrderTypes.MaxHealth);
-            
-            if(minion.Count > 0){
-                 var minions = minion[0];
-             if (Config.Item("UseQLaneClear").GetValue<bool>() && Q.IsReady() && minions.IsValidTarget(Q.Range))
-             {
-                 Q.Cast();
-             }
 
-             if (Config.Item("UseWLaneClear").GetValue<bool>() && W.IsReady())
-             {
-                 W.Cast();
-             }
-             if (Config.Item("UseELaneClear").GetValue<bool>() && E.IsReady() && minions.IsValidTarget(E.Range) )
-             {
-                 E.Cast(minions);
-             }
-             if (Config.Item("Tiamat").GetValue<bool>() && tiamat.IsReady())
-                 tiamat.Cast();
+            if (minion.Count > 0)
+            {
+                var minions = minion[0];
+                if (Config.Item("UseQLaneClear").GetValue<bool>() && Q.IsReady() && minions.IsValidTarget(Q.Range))
+                {
+                    Q.Cast();
+                }
+                if (Config.Item("Tiamat").GetValue<bool>() && tiamat.IsReady())
+                    tiamat.Cast();
 
-             if (Config.Item("Hydra").GetValue<bool>() && hydra.IsReady())
-                 hydra.Cast();
+                if (Config.Item("Hydra").GetValue<bool>() && hydra.IsReady())
+                    hydra.Cast();
+            }
+            if (minion.Count > 2)
+            {
+                var minions = minion[2];
+                if (Config.Item("UseELaneClear").GetValue<bool>() && E.IsReady() && minions.IsValidTarget(E.Range))
+                {
+                    E.Cast(minions);
+                }
+            }
         }
-    }
         static void JungleClear()
         {
             var mobs = MinionManager.GetMinions(Player.ServerPosition, E.Range,
@@ -268,20 +292,20 @@ namespace KS
                 {
                     Q.Cast();
                 }
-
-                if (Config.Item("UseWJungleClear").GetValue<bool>() && W.IsReady())
-                {
-                    W.Cast();
-                }
-                if (Config.Item("UseEJungleClear").GetValue<bool>() && E.IsReady() && minions.IsValidTarget(E.Range))
-                {
-                    E.Cast(minions);
-                }
                 if (Config.Item("Tiamat").GetValue<bool>() && tiamat.IsReady())
                     tiamat.Cast();
 
                 if (Config.Item("Hydra").GetValue<bool>() && hydra.IsReady())
                     hydra.Cast();
+            }
+
+            if (mobs.Count > 2)
+            {
+                var minions = mobs[2];
+                if (Config.Item("UseEJungleClear").GetValue<bool>() && E.IsReady() && minions.IsValidTarget(E.Range))
+                {
+                    E.Cast(minions);
+                }
             }
 
         }

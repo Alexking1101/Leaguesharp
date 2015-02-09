@@ -68,7 +68,7 @@
     <Compile Include="Blitzcrank.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="In Work.cs" />
+    <Compile Include="Wukong.cs" />
     <Compile Include="Xin Zhao.cs" />
   </ItemGroup>
   <ItemGroup>
