@@ -28,6 +28,7 @@ namespace KS
         public static Spell E;
         public static Spell R;
 
+        private static SpellSlot IgniteSlot;
 
         public static Items.Item HEX;
         public static Items.Item DFG;
@@ -55,6 +56,8 @@ namespace KS
             SpellList.Add(W);
             SpellList.Add(E);
             SpellList.Add(R);
+
+            IgniteSlot = Player.GetSpellSlot("SummonerDot");
 
             HEX = new Items.Item(3146, 700);
             DFG = new Items.Item(3128, 750);
@@ -111,7 +114,8 @@ namespace KS
             Config.SubMenu("Drawings").AddItem(new MenuItem("RRange", "R Range").SetValue(new Circle(true, Color.FromArgb(150, Color.DodgerBlue))));
             Config.AddToMainMenu();
 
-
+            Utility.HpBarDamageIndicator.DamageToUnit = GetComboDamage;
+            Utility.HpBarDamageIndicator.Enabled = true;
 
             Game.OnGameUpdate += Game_OnGameUpdate;
             Drawing.OnDraw += Drawing_OnDraw;
@@ -233,6 +237,26 @@ namespace KS
                 }
             }
         }
+
+        private static float GetComboDamage(Obj_AI_Base vTarget)
+        {
+            var fComboDamage = 0d;
+
+            if (Q.IsReady())
+                fComboDamage += Player.GetSpellDamage(vTarget, SpellSlot.Q);
+
+            if (E.IsReady())
+                fComboDamage += Player.GetSpellDamage(vTarget, SpellSlot.E);
+
+            if (R.IsReady())
+                fComboDamage += Player.GetSpellDamage(vTarget, SpellSlot.R);
+
+            if (IgniteSlot != SpellSlot.Unknown && Player.Spellbook.CanUseSpell(IgniteSlot) == SpellState.Ready)
+                fComboDamage += Player.GetSummonerSpellDamage(vTarget, Damage.SummonerSpell.Ignite);
+
+            return (float)fComboDamage;
+        }
+
         private static void Harass()
         {
             var target = TargetSelector.GetTarget(Q.Range, TargetSelector.DamageType.Magical);

@@ -50,6 +50,10 @@ namespace KS
                     new Olaf();
                     break;
 
+                case "Fizz":
+                    new Fizz();
+                    break;
+
                 default:
                     Game.PrintChat("<font color='#05F4F4'>[Kysama Series] This Champion is not supportet</font>");
                     break;

@@ -66,6 +66,8 @@
     <Compile Include="Akali.cs" />
     <Compile Include="Amumu.cs" />
     <Compile Include="Blitzcrank.cs" />
+    <Compile Include="DamageIndicator.cs" />
+    <Compile Include="Fizz.cs" />
     <Compile Include="Olaf.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
